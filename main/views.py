@@ -10,13 +10,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import (IsAuthenticated,IsAdminUser)
 
 #my import 
 from .serializers import UserSerializer
 
 
 class UserList(APIView):
+
+    permission_classes = ([IsAuthenticated,IsAdminUser])
 
     def get(self,request:Request,format=None):
         userlist = User.objects.all()
@@ -26,6 +29,8 @@ class UserList(APIView):
 
 
 class UserDetail(APIView):
+
+    permission_classes = ([IsAuthenticated,IsAdminUser])
 
     def get_object(self,pk):
         try:
@@ -54,6 +59,8 @@ class UserDetail(APIView):
 
 
 class Signup(APIView):
+    permission_classes = ([IsAuthenticated,IsAdminUser])
+
     def post(self,request:Request,format=None):
         user = UserSerializer(request.data)
 
@@ -62,7 +69,9 @@ class Signup(APIView):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.error,status=status.HHTP_400_BAD_REQUEST)
 
+
 @api_view(["POST"])
+@permission_classes([IsAuthenticated,IsAdminUser])
 def signin(request):
     
     username = request.POST.get("username")
